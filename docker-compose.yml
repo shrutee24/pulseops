@@ -1,0 +1,61 @@
+version: "1.0"
+
+services:
+  pulseops-app:
+    image: shrutee577/pulseops:latest
+    container_name: pulseops-app
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "3000:3000"
+
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 512M
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+
+    healthcheck:
+      test: [
+        "CMD-SHELL",
+        "node -e \"const http=require('http');const port=process.env.PORT||3000;http.get('http://localhost:'+port, r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))\""
+    ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+
+  mongo:
+    image: mongo:7
+    container_name: pulseops-mongo
+    restart: always
+
+    volumes:
+      - mongo-data:/data/db
+
+    deploy:
+      resources:
+        limits:
+          cpus: "0.75"
+          memory: 1G
+        reservations:
+          cpus: "0.25"
+          memory: 512M
+
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+
+volumes:
+  mongo-data:
