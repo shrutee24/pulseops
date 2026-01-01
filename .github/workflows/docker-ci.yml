@@ -30,6 +30,11 @@ jobs:
         env:
           IMAGE_NAME: ${{ secrets.IMAGE_NAME }}
 
+      - name: Preview Docker images
+        run: docker images
+        env:
+          IMAGE_NAME: ${{ secrets.IMAGE_NAME }}
+
       - name: Push Docker image
         run: ./scripts/push.sh
         env:
