@@ -1,0 +1,23 @@
+version: "3.9"
+
+services:
+  pulseops-app:
+    image: pulseops-app
+    container_name: pulseops-app
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo:7
+    container_name: pulseops-mongo
+    restart: always
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:
